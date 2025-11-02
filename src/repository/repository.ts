@@ -12,12 +12,10 @@ let tasksTable: task[] = [
 
 export type RepositoryErr = NetworkErr;
 
-export type NetworkErr = {type: "NetworkError", message: string};
+export type NetworkErr = { type: "NetworkError"; message: string };
 
-export class Repository {
-	createTask = (task: task): Result<task, RepositoryErr> => {
-		tasksTable.push(task);
-		// return ok(task);
-    return err({type: "NetworkError", message: "ネットワークエラーです。しばらく待って。"})
-	};
+export function createTask(task: task): Result<task, RepositoryErr> {
+	tasksTable.push(task);
+	return ok(task);
+	// return err({type: "NetworkError", message: "ネットワークエラーです。しばらく待って。"})
 }
