@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "ESNext",
+		"target": "es2022",
 		"module": "NodeNext",
 		"strict": true,
 		"verbatimModuleSyntax": true,
