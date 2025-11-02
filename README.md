@@ -1,2 +1,8 @@
-# ts-rop-practice
-TypeScriptで Railway Oriented Programming の練習
+```
+npm install
+npm run dev
+```
+
+```
+open http://localhost:3000
+```
