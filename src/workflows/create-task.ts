@@ -1,6 +1,6 @@
 import type { Result } from "neverthrow";
 import { task, type ValidationError } from "../domain/task.js";
-import { type Repository, type RepositoryErr } from "../repository/index.js";
+import type { Repository, RepositoryErr } from "../repository/index.js";
 
 interface createTaskWorkflowInput {
 	title: string;

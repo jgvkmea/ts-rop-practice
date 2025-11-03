@@ -1,8 +1,9 @@
-import { Result, ok, err } from "neverthrow";
+import { randomInt } from "node:crypto";
+import { err, ok, type Result } from "neverthrow";
 import type { task } from "../domain/task.js";
 import type { Repository, RepositoryErr } from "./types.js";
 
-let tasksTable: task[] = [
+const tasksTable: task[] = [
 	{
 		id: "1",
 		title: "タスク1",
@@ -12,8 +13,14 @@ let tasksTable: task[] = [
 
 export class MemoryRepository implements Repository {
 	createTask(task: task): Result<task, RepositoryErr> {
-		tasksTable.push(task);
-		return ok(task);
-		// return err({type: "NetworkError", message: "ネットワークエラーです。しばらく待って。"})
+		if (randomInt(10) < 9) {
+			tasksTable.push(task);
+			return ok(task);
+		} else {
+			return err({
+				type: "NetworkError",
+				message: "ネットワークエラーです。しばらく待って。",
+			});
+		}
 	}
 }

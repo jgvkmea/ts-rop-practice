@@ -1,5 +1,5 @@
-import { type Result, ok, err } from "neverthrow";
 import { randomUUID } from "node:crypto";
+import { err, ok, type Result } from "neverthrow";
 
 export type task = Readonly<{
 	id: string; // TODO: VO定義する
