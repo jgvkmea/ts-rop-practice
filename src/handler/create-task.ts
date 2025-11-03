@@ -1,15 +1,16 @@
 import type { Context } from "hono";
 import {
-	type createTaskWorkflowInput,
+	type createTaskWorkflowCommand,
 	createTaskWorkflow,
 } from "../workflows/index.js";
 import { z } from "zod";
 import { type Result, ok, err } from "neverthrow";
+import { MemoryRepository } from "../repository/memory-repository.js";
 
 export type ValidationError = { type: "ValidationError"; message: string };
 
 export async function createTaskHandler(c: Context) {
-	return (await createTaskHandlerInput(c)).andThen(createTaskWorkflow).match(
+	return (await createTaskHandlerCommand(c)).andThen(createTaskWorkflow).match(
 		(value) => c.json(value),
 		(e) => {
 			switch (e.type) {
@@ -32,9 +33,9 @@ const CreateTaskRequest = z.object({
 		.trim(),
 });
 
-async function createTaskHandlerInput(
+async function createTaskHandlerCommand(
 	c: Context,
-): Promise<Result<createTaskWorkflowInput, ValidationError>> {
+): Promise<Result<createTaskWorkflowCommand, ValidationError>> {
 	const body = await c.req.json();
 	const result = CreateTaskRequest.safeParse(body);
 
@@ -46,6 +47,9 @@ async function createTaskHandlerInput(
 	}
 
 	return ok({
-		title: result.data.title,
+		input: {
+			title: result.data.title,
+		},
+		repository: new MemoryRepository(),
 	});
 }

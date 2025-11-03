@@ -1,13 +1,18 @@
 import type { Result } from "neverthrow";
 import { task, type ValidationError } from "../domain/task.js";
-import { createTask, type RepositoryErr } from "../repository/index.js";
+import { type Repository, type RepositoryErr } from "../repository/index.js";
 
-export interface createTaskWorkflowInput {
+interface createTaskWorkflowInput {
 	title: string;
 }
 
+export interface createTaskWorkflowCommand {
+	input: createTaskWorkflowInput;
+	repository: Repository;
+}
+
 export function createTaskWorkflow(
-	input: createTaskWorkflowInput,
+	command: createTaskWorkflowCommand,
 ): Result<task, RepositoryErr | ValidationError> {
-	return task(input.title).andThen(createTask);
+	return task(command.input.title).andThen(command.repository.createTask);
 }
