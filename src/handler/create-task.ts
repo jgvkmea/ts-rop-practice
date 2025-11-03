@@ -50,6 +50,6 @@ async function createTaskHandlerCommand(
 		input: {
 			title: result.data.title,
 		},
-		repository: new MemoryRepository(),
+		repository: new MemoryRepository(), // TODO: DIちゃんとやる
 	});
 }
