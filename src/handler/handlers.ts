@@ -5,6 +5,8 @@ import { LowdbRepository } from "../repository";
 import {
 	createTaskWorkflow,
 	type createTaskWorkflowCommand,
+	deleteTaskWorkflow,
+	type deleteTaskWorkflowCommand,
 	getTaskWorkflow,
 	type getTaskWorkflowCommand,
 	updateTaskWorkflow,
@@ -145,6 +147,44 @@ async function updatedTaskCommand(
 			id: id,
 			title: result.data.title,
 			status: result.data.status,
+		},
+		repository: new LowdbRepository(),
+	});
+}
+
+// Delete Task Handler
+export async function deleteTaskHandler(c: Context) {
+	return deleteTaskHandlerCommand(c)
+		.andThen(deleteTaskWorkflow)
+		.match(
+			(value) => c.json({ id: value }),
+			(e) => {
+				switch (e.type) {
+					case "ValidationError":
+						return c.json({ message: e.message }, 400);
+					case "NetworkError":
+						return c.json({ message: e.message }, 503);
+					default:
+						return c.json({ message: "Internal Server Error" }, 500);
+				}
+			},
+		);
+}
+
+function deleteTaskHandlerCommand(
+	c: Context,
+): Result<deleteTaskWorkflowCommand, ValidationError> {
+	const id = c.req.param("id");
+	if (!id) {
+		return err({
+			type: "ValidationError",
+			message: "IDが指定されていません。",
+		});
+	}
+
+	return ok({
+		input: {
+			id: id,
 		},
 		repository: new LowdbRepository(),
 	});

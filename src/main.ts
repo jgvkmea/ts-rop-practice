@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import {
 	createTaskHandler,
+	deleteTaskHandler,
 	getTaskHandler,
 	updateTaskHandler,
 } from "./handler";
@@ -18,6 +19,10 @@ app.get("/tasks/:id", (c) => {
 
 app.put("/tasks/:id", (c) => {
 	return updateTaskHandler(c);
+});
+
+app.delete("/tasks/:id", (c) => {
+	return deleteTaskHandler(c);
 });
 
 serve(

@@ -56,3 +56,21 @@ export function updateTaskWorkflow(
 		)
 		.andThen((updatedTask) => command.repository.updateTask(updatedTask));
 }
+
+// Delete Task Workflow
+interface deleteTaskWorkflowInput {
+	id: string;
+}
+
+export interface deleteTaskWorkflowCommand {
+	input: deleteTaskWorkflowInput;
+	repository: Repository;
+}
+
+export function deleteTaskWorkflow(
+	command: deleteTaskWorkflowCommand,
+): Result<string, NotFoundErr | NetworkErr> {
+	return command.repository
+		.deleteTask(command.input.id)
+		.map(() => command.input.id);
+}

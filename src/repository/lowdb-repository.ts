@@ -23,15 +23,27 @@ await initializeDb();
 
 export class LowdbRepository implements Repository {
 	createTask(task: Task): Result<Task, NetworkErr> {
-		// 異常ケースの動作確認のため、タイトルが "NG" の場合にエラーを返す
 		if (task.title !== "NG") {
 			db.data.tasks.push(task);
 			db.write();
 			return ok(task);
 		} else {
+			// 異常ケースの動作確認のための擬似的なエラーケース
 			return err({
 				type: "NetworkError",
 				message: "ネットワークエラーです。しばらく待って。",
+			});
+		}
+	}
+
+	getTask(id: TaskId): Result<Task, NotFoundErr> {
+		const foundTask = db.data.tasks.find((task) => task.id === id);
+		if (foundTask) {
+			return ok(foundTask);
+		} else {
+			return err({
+				type: "NotFoundError",
+				message: "タスクが見つかりません。",
 			});
 		}
 	}
@@ -50,15 +62,18 @@ export class LowdbRepository implements Repository {
 		}
 	}
 
-	getTask(id: TaskId): Result<Task, NotFoundErr> {
-		const foundTask = db.data.tasks.find((task) => task.id === id);
-		if (foundTask) {
-			return ok(foundTask);
-		} else {
+	deleteTask(id: TaskId): Result<void, NetworkErr> {
+		const index = db.data.tasks.findIndex((t) => t.id === id);
+		if (index === 2) {
+			// 異常ケースの動作確認のための擬似的なエラーケース
 			return err({
-				type: "NotFoundError",
-				message: "タスクが見つかりません。",
+				type: "NetworkError",
+				message: "ネットワークエラーです。しばらく待って。",
 			});
+		} else if (index !== -1) {
+			db.data.tasks.splice(index, 1);
+			db.write();
 		}
+		return ok(undefined);
 	}
 }
