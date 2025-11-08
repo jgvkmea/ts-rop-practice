@@ -1,8 +1,8 @@
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 import { err, ok, type Result } from "neverthrow";
-import type { task } from "../domain/task.js";
-import type { Repository, RepositoryErr } from "./types.js";
+import type { task } from "../domain";
+import type { Repository, RepositoryErr } from "./types";
 
 type Task = task;
 type Schema = { tasks: Task[] };

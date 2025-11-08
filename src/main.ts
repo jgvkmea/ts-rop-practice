@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { createTaskHandler } from "./handler/create-task.js";
+import { createTaskHandler } from "./handler";
 
 const app = new Hono();
 

@@ -1,6 +1,6 @@
 import { err, ok, type Result } from "neverthrow";
-import type { task } from "../domain/task.js";
-import type { Repository, RepositoryErr } from "./types.js";
+import type { task } from "../domain";
+import type { Repository, RepositoryErr } from "./types";
 
 const tasksTable: task[] = [
 	{

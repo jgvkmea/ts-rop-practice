@@ -1,3 +1,3 @@
-export * from "./lowdb-repository.js";
-export * from "./memory-repository.js";
-export * from "./types.js";
+export * from "./lowdb-repository";
+export * from "./memory-repository";
+export * from "./types";

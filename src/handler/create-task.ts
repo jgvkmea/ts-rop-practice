@@ -1,11 +1,11 @@
 import type { Context } from "hono";
 import { err, ok, type Result } from "neverthrow";
 import { z } from "zod";
-import { LowdbRepository } from "../repository/lowdb-repository.js";
+import { LowdbRepository } from "../repository";
 import {
 	createTaskWorkflow,
 	type createTaskWorkflowCommand,
-} from "../workflows/index.js";
+} from "../workflows";
 
 export type ValidationError = { type: "ValidationError"; message: string };
 

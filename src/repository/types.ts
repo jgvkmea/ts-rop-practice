@@ -1,5 +1,5 @@
 import type { Result } from "neverthrow";
-import type { task } from "../domain/task.js";
+import type { task } from "../domain";
 
 export type RepositoryErr = NetworkErr;
 
