@@ -110,8 +110,6 @@ export async function updateTaskHandler(c: Context) {
 					return c.json({ message: e.message }, 400);
 				case "NotFoundError":
 					return c.json({ message: e.message }, 404);
-				case "NetworkError":
-					return c.json({ message: e.message }, 503);
 				default:
 					return c.json({ message: "Internal Server Error" }, 500);
 			}

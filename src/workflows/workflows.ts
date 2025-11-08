@@ -1,5 +1,5 @@
 import type { Result, ResultAsync } from "neverthrow";
-import { Task, updateTask, type ValidationError } from "../domain/task";
+import { Task, TaskId, updateTask, type ValidationError } from "../domain/task";
 import type { NetworkErr, NotFoundErr, Repository } from "../repository/index";
 
 // Create Task Workflow
@@ -30,8 +30,8 @@ export interface getTaskWorkflowCommand {
 
 export function getTaskWorkflow(
 	command: getTaskWorkflowCommand,
-): Result<Task, NotFoundErr> {
-	return command.repository.getTask(command.input.id);
+): Result<Task, ValidationError | NotFoundErr> {
+	return TaskId(command.input.id).andThen(command.repository.getTask);
 }
 
 // Update Task Workflow
@@ -48,9 +48,9 @@ export interface updateTaskWorkflowCommand {
 
 export function updateTaskWorkflow(
 	command: updateTaskWorkflowCommand,
-): ResultAsync<Task, NotFoundErr | NetworkErr | ValidationError> {
-	return command.repository
-		.getTask(command.input.id)
+): ResultAsync<Task, NotFoundErr | ValidationError> {
+	return TaskId(command.input.id)
+		.andThen(command.repository.getTask)
 		.andThen((task) =>
 			updateTask(task, command.input.title, command.input.status),
 		)
@@ -69,8 +69,8 @@ export interface deleteTaskWorkflowCommand {
 
 export function deleteTaskWorkflow(
 	command: deleteTaskWorkflowCommand,
-): ResultAsync<string, NotFoundErr | NetworkErr> {
-	return command.repository
-		.deleteTask(command.input.id)
+): ResultAsync<string, ValidationError | NetworkErr> {
+	return TaskId(command.input.id)
+		.asyncAndThen(command.repository.deleteTask)
 		.map(() => command.input.id);
 }
