@@ -24,19 +24,19 @@ await initializeDb();
 export class LowdbRepository implements Repository {
 	createTask(task: Task): ResultAsync<Task, NetworkErr> {
 		return ResultAsync.fromPromise(
-			new Promise((resolve, reject) => {
+			(async () => {
 				if (task.title === "NG") {
 					// 異常ケースの動作確認のための擬似的なエラーケース
-					return reject({
+					throw {
 						type: "NetworkError",
 						message: "ネットワークエラーです。しばらく待って。",
-					});
+					};
 				}
 
 				db.data.tasks.push(task);
-				db.write();
-				return resolve(task);
-			}),
+				await db.write();
+				return task;
+			})(),
 			(e) => e as NetworkErr,
 		);
 	}
@@ -55,39 +55,39 @@ export class LowdbRepository implements Repository {
 
 	updateTask(task: Task): ResultAsync<Task, NotFoundErr> {
 		return ResultAsync.fromPromise(
-			new Promise((resolve, reject) => {
+			(async () => {
 				const index = db.data.tasks.findIndex((t) => t.id === task.id);
 				if (index === -1) {
-					return reject({
+					throw {
 						type: "NotFoundError",
 						message: "タスクが見つかりません。",
-					});
+					};
 				}
 
 				db.data.tasks[index] = task;
-				db.write();
-				return resolve(task);
-			}),
+				await db.write();
+				return task;
+			})(),
 			(e) => e as NotFoundErr,
 		);
 	}
 
 	deleteTask(id: TaskId): ResultAsync<void, NetworkErr> {
 		return ResultAsync.fromPromise(
-			new Promise((resolve, reject) => {
+			(async () => {
 				const index = db.data.tasks.findIndex((t) => t.id === id);
 				if (index === 2) {
 					// 異常ケースの動作確認のための擬似的なエラーケース
-					return reject({
+					throw {
 						type: "NetworkError",
 						message: "ネットワークエラーです。しばらく待って。",
-					});
+					};
 				} else if (index !== -1) {
 					db.data.tasks.splice(index, 1);
-					db.write();
+					await db.write();
 				}
-				return resolve(undefined);
-			}),
+				return undefined;
+			})(),
 			(e) => e as NetworkErr,
 		);
 	}
