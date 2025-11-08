@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { err, ok, type Result } from "neverthrow";
 import { z } from "zod";
-import { MemoryRepository } from "../repository/memory-repository.js";
+import { LowdbRepository } from "../repository/lowdb-repository.js";
 import {
 	createTaskWorkflow,
 	type createTaskWorkflowCommand,
@@ -50,6 +50,6 @@ async function createTaskHandlerCommand(
 		input: {
 			title: result.data.title,
 		},
-		repository: new MemoryRepository(), // TODO: DIちゃんとやる
+		repository: new LowdbRepository(), // TODO: DIちゃんとやる
 	});
 }

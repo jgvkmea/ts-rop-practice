@@ -1,4 +1,3 @@
-import { randomInt } from "node:crypto";
 import { err, ok, type Result } from "neverthrow";
 import type { task } from "../domain/task.js";
 import type { Repository, RepositoryErr } from "./types.js";
@@ -13,7 +12,8 @@ const tasksTable: task[] = [
 
 export class MemoryRepository implements Repository {
 	createTask(task: task): Result<task, RepositoryErr> {
-		if (randomInt(10) < 9) {
+		// 異常ケースの動作確認のため、タイトルが "NG" の場合にエラーを返す
+		if (task.title !== "NG") {
 			tasksTable.push(task);
 			return ok(task);
 		} else {
