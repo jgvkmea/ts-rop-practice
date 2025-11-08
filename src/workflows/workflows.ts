@@ -1,6 +1,6 @@
 import type { Result, ResultAsync } from "neverthrow";
-import { Task, TaskId, updateTask, type ValidationError } from "../domain/task";
-import type { NetworkErr, NotFoundErr } from "../errors";
+import { Task, TaskId, updateTask } from "../domain/task";
+import type { NetworkErr, NotFoundErr, ValidationError } from "../errors";
 import type { Repository } from "../repository/index";
 
 // Create Task Workflow

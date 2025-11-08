@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { err, ok, type Result } from "neverthrow";
 import { z } from "zod";
-import type { ValidationError } from "../domain";
+import type { ValidationError } from "../errors";
 import { LowdbRepository } from "../repository";
 import {
 	createTaskWorkflow,

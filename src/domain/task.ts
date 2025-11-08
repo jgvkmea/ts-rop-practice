@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { err, ok, Result } from "neverthrow";
+import type { ValidationError } from "../errors";
 import { isUUID } from "../utils";
 
 // TaskId
@@ -57,8 +58,6 @@ export type Task = Readonly<{
 	title: Title;
 	status: Status;
 }>;
-
-export type ValidationError = { type: "ValidationError"; message: string };
 
 export function Task(titleValue: string): Result<Task, ValidationError> {
 	const taskIdResult = TaskId();
