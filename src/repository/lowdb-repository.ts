@@ -2,7 +2,7 @@ import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 import { err, ok, type Result } from "neverthrow";
 import type { task } from "../domain";
-import type { Repository, RepositoryErr } from "./types";
+import type { NetworkErr, NotFoundErr, Repository } from "./types";
 
 type Task = task;
 type Schema = { tasks: Task[] };
@@ -23,7 +23,7 @@ const initializeDb = async () => {
 await initializeDb();
 
 export class LowdbRepository implements Repository {
-	createTask(task: task): Result<task, RepositoryErr> {
+	createTask(task: task): Result<task, NetworkErr> {
 		// 異常ケースの動作確認のため、タイトルが "NG" の場合にエラーを返す
 		if (task.title !== "NG") {
 			db.data.tasks.push(task);
@@ -33,6 +33,18 @@ export class LowdbRepository implements Repository {
 			return err({
 				type: "NetworkError",
 				message: "ネットワークエラーです。しばらく待って。",
+			});
+		}
+	}
+
+	getTask(id: string): Result<task, NotFoundErr> {
+		const foundTask = db.data.tasks.find((task) => task.id === id);
+		if (foundTask) {
+			return ok(foundTask);
+		} else {
+			return err({
+				type: "NotFoundError",
+				message: "タスクが見つかりません。",
 			});
 		}
 	}

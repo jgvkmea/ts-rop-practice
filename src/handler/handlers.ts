@@ -5,6 +5,8 @@ import { LowdbRepository } from "../repository";
 import {
 	createTaskWorkflow,
 	type createTaskWorkflowCommand,
+	getTaskWorkflow,
+	type getTaskWorkflowCommand,
 } from "../workflows";
 
 export type ValidationError = { type: "ValidationError"; message: string };
@@ -52,4 +54,44 @@ async function createTaskHandlerCommand(
 		},
 		repository: new LowdbRepository(), // TODO: DIちゃんとやる
 	});
+}
+
+export async function getTaskHandler(c: Context) {
+	return (await getTaskHandlerCommand(c)).andThen(getTaskWorkflow).match(
+		(value) => c.json(value),
+		(e) => {
+			switch (e.type) {
+				case "ValidationError":
+					return c.json({ message: e.message }, 400);
+				case "NotFoundError":
+					return c.json({ message: e.message }, 404);
+				default:
+					return c.json({ message: "Internal Server Error" }, 500);
+			}
+		},
+	);
+}
+
+function getTaskHandlerCommand(
+	c: Context,
+): Promise<Result<getTaskWorkflowCommand, ValidationError>> {
+	const id = c.req.param("id");
+
+	if (!id) {
+		return Promise.resolve(
+			err({
+				type: "ValidationError",
+				message: "IDが指定されていません。",
+			}),
+		);
+	}
+
+	return Promise.resolve(
+		ok({
+			input: {
+				id: id,
+			},
+			repository: new LowdbRepository(), // TODO: DIちゃんとやる
+		}),
+	);
 }

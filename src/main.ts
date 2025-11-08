@@ -1,15 +1,15 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { createTaskHandler } from "./handler";
+import { createTaskHandler, getTaskHandler } from "./handler";
 
 const app = new Hono();
 
-app.get("/", (c) => {
-	return c.text("Hello Hono!");
-});
-
 app.post("/tasks", (c) => {
 	return createTaskHandler(c);
+});
+
+app.get("/tasks/:id", (c) => {
+	return getTaskHandler(c);
 });
 
 serve(
