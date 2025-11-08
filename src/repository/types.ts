@@ -1,8 +1,6 @@
 import type { Result, ResultAsync } from "neverthrow";
 import type { Task, TaskId } from "../domain";
-
-export type NetworkErr = { type: "NetworkError"; message: string };
-export type NotFoundErr = { type: "NotFoundError"; message: string };
+import type { NetworkErr, NotFoundErr } from "../errors";
 
 export interface Repository {
 	createTask(task: Task): ResultAsync<Task, NetworkErr>;

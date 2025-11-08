@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import { err, ok, type Result } from "neverthrow";
 import { z } from "zod";
+import type { ValidationError } from "../domain";
 import { LowdbRepository } from "../repository";
 import {
 	createTaskWorkflow,
@@ -12,8 +13,6 @@ import {
 	updateTaskWorkflow,
 	type updateTaskWorkflowCommand,
 } from "../workflows";
-
-export type ValidationError = { type: "ValidationError"; message: string };
 
 // Create Task Handler
 export async function createTaskHandler(c: Context) {

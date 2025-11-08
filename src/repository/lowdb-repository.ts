@@ -2,7 +2,8 @@ import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 import { err, ok, type Result, ResultAsync } from "neverthrow";
 import type { Task, TaskId } from "../domain";
-import type { NetworkErr, NotFoundErr, Repository } from "./types";
+import type { NetworkErr, NotFoundErr } from "../errors";
+import type { Repository } from "./types";
 
 type Schema = { tasks: Task[] };
 
