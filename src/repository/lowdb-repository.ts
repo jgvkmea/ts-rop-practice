@@ -1,6 +1,6 @@
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
-import { err, ok, type Result } from "neverthrow";
+import { err, ok, type Result, ResultAsync } from "neverthrow";
 import type { Task, TaskId } from "../domain";
 import type { NetworkErr, NotFoundErr, Repository } from "./types";
 
@@ -22,18 +22,23 @@ const initializeDb = async () => {
 await initializeDb();
 
 export class LowdbRepository implements Repository {
-	createTask(task: Task): Result<Task, NetworkErr> {
-		if (task.title !== "NG") {
-			db.data.tasks.push(task);
-			db.write();
-			return ok(task);
-		} else {
-			// 異常ケースの動作確認のための擬似的なエラーケース
-			return err({
-				type: "NetworkError",
-				message: "ネットワークエラーです。しばらく待って。",
-			});
-		}
+	createTask(task: Task): ResultAsync<Task, NetworkErr> {
+		return ResultAsync.fromPromise(
+			new Promise((resolve, reject) => {
+				if (task.title === "NG") {
+					// 異常ケースの動作確認のための擬似的なエラーケース
+					return reject({
+						type: "NetworkError",
+						message: "ネットワークエラーです。しばらく待って。",
+					});
+				}
+
+				db.data.tasks.push(task);
+				db.write();
+				return resolve(task);
+			}),
+			(e) => e as NetworkErr,
+		);
 	}
 
 	getTask(id: TaskId): Result<Task, NotFoundErr> {
@@ -48,32 +53,42 @@ export class LowdbRepository implements Repository {
 		}
 	}
 
-	updateTask(task: Task): Result<Task, NotFoundErr> {
-		const index = db.data.tasks.findIndex((t) => t.id === task.id);
-		if (index !== -1) {
-			db.data.tasks[index] = task;
-			db.write();
-			return ok(task);
-		} else {
-			return err({
-				type: "NotFoundError",
-				message: "タスクが見つかりません。",
-			});
-		}
+	updateTask(task: Task): ResultAsync<Task, NotFoundErr> {
+		return ResultAsync.fromPromise(
+			new Promise((resolve, reject) => {
+				const index = db.data.tasks.findIndex((t) => t.id === task.id);
+				if (index === -1) {
+					return reject({
+						type: "NotFoundError",
+						message: "タスクが見つかりません。",
+					});
+				}
+
+				db.data.tasks[index] = task;
+				db.write();
+				return resolve(task);
+			}),
+			(e) => e as NotFoundErr,
+		);
 	}
 
-	deleteTask(id: TaskId): Result<void, NetworkErr> {
-		const index = db.data.tasks.findIndex((t) => t.id === id);
-		if (index === 2) {
-			// 異常ケースの動作確認のための擬似的なエラーケース
-			return err({
-				type: "NetworkError",
-				message: "ネットワークエラーです。しばらく待って。",
-			});
-		} else if (index !== -1) {
-			db.data.tasks.splice(index, 1);
-			db.write();
-		}
-		return ok(undefined);
+	deleteTask(id: TaskId): ResultAsync<void, NetworkErr> {
+		return ResultAsync.fromPromise(
+			new Promise((resolve, reject) => {
+				const index = db.data.tasks.findIndex((t) => t.id === id);
+				if (index === 2) {
+					// 異常ケースの動作確認のための擬似的なエラーケース
+					return reject({
+						type: "NetworkError",
+						message: "ネットワークエラーです。しばらく待って。",
+					});
+				} else if (index !== -1) {
+					db.data.tasks.splice(index, 1);
+					db.write();
+				}
+				return resolve(undefined);
+			}),
+			(e) => e as NetworkErr,
+		);
 	}
 }

@@ -1,4 +1,4 @@
-import type { Result } from "neverthrow";
+import type { Result, ResultAsync } from "neverthrow";
 import { Task, updateTask, type ValidationError } from "../domain/task";
 import type { NetworkErr, NotFoundErr, Repository } from "../repository/index";
 
@@ -14,8 +14,8 @@ export interface createTaskWorkflowCommand {
 
 export function createTaskWorkflow(
 	command: createTaskWorkflowCommand,
-): Result<Task, NetworkErr | ValidationError> {
-	return Task(command.input.title).andThen(command.repository.createTask);
+): ResultAsync<Task, NetworkErr | ValidationError> {
+	return Task(command.input.title).asyncAndThen(command.repository.createTask);
 }
 
 // Get Task Workflow
@@ -48,13 +48,13 @@ export interface updateTaskWorkflowCommand {
 
 export function updateTaskWorkflow(
 	command: updateTaskWorkflowCommand,
-): Result<Task, NotFoundErr | NetworkErr | ValidationError> {
+): ResultAsync<Task, NotFoundErr | NetworkErr | ValidationError> {
 	return command.repository
 		.getTask(command.input.id)
 		.andThen((task) =>
 			updateTask(task, command.input.title, command.input.status),
 		)
-		.andThen((updatedTask) => command.repository.updateTask(updatedTask));
+		.asyncAndThen(command.repository.updateTask);
 }
 
 // Delete Task Workflow
@@ -69,7 +69,7 @@ export interface deleteTaskWorkflowCommand {
 
 export function deleteTaskWorkflow(
 	command: deleteTaskWorkflowCommand,
-): Result<string, NotFoundErr | NetworkErr> {
+): ResultAsync<string, NotFoundErr | NetworkErr> {
 	return command.repository
 		.deleteTask(command.input.id)
 		.map(() => command.input.id);

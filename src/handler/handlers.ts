@@ -17,19 +17,21 @@ export type ValidationError = { type: "ValidationError"; message: string };
 
 // Create Task Handler
 export async function createTaskHandler(c: Context) {
-	return (await createTaskHandlerCommand(c)).andThen(createTaskWorkflow).match(
-		(value) => c.json(value),
-		(e) => {
-			switch (e.type) {
-				case "ValidationError":
-					return c.json({ message: e.message }, 400);
-				case "NetworkError":
-					return c.json({ message: e.message }, 503);
-				default:
-					return c.json({ message: "Internal Server Error" }, 500);
-			}
-		},
-	);
+	return (await createTaskHandlerCommand(c))
+		.asyncAndThen(createTaskWorkflow)
+		.match(
+			(value) => c.json(value),
+			(e) => {
+				switch (e.type) {
+					case "ValidationError":
+						return c.json({ message: e.message }, 400);
+					case "NetworkError":
+						return c.json({ message: e.message }, 503);
+					default:
+						return c.json({ message: "Internal Server Error" }, 500);
+				}
+			},
+		);
 }
 
 const CreateTaskRequest = z.object({
@@ -100,7 +102,7 @@ function getTaskHandlerCommand(
 
 // Update Task Handler
 export async function updateTaskHandler(c: Context) {
-	return (await updatedTaskCommand(c)).andThen(updateTaskWorkflow).match(
+	return (await updatedTaskCommand(c)).asyncAndThen(updateTaskWorkflow).match(
 		(value) => c.json(value),
 		(e) => {
 			switch (e.type) {
@@ -155,7 +157,7 @@ async function updatedTaskCommand(
 // Delete Task Handler
 export async function deleteTaskHandler(c: Context) {
 	return deleteTaskHandlerCommand(c)
-		.andThen(deleteTaskWorkflow)
+		.asyncAndThen(deleteTaskWorkflow)
 		.match(
 			(value) => c.json({ id: value }),
 			(e) => {
