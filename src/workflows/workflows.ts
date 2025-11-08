@@ -1,7 +1,8 @@
 import type { Result } from "neverthrow";
-import { Task, UpdateTask, type ValidationError } from "../domain/task";
+import { Task, updateTask, type ValidationError } from "../domain/task";
 import type { NetworkErr, NotFoundErr, Repository } from "../repository/index";
 
+// Create Task Workflow
 interface createTaskWorkflowInput {
 	title: string;
 }
@@ -17,6 +18,7 @@ export function createTaskWorkflow(
 	return Task(command.input.title).andThen(command.repository.createTask);
 }
 
+// Get Task Workflow
 interface getTaskWorkflowInput {
 	id: string;
 }
@@ -32,12 +34,15 @@ export function getTaskWorkflow(
 	return command.repository.getTask(command.input.id);
 }
 
+// Update Task Workflow
+interface updateTaskWorkflowInput {
+	id: string;
+	title?: string;
+	status?: string;
+}
+
 export interface updateTaskWorkflowCommand {
-	input: {
-		id: string;
-		title?: string;
-		status?: string;
-	};
+	input: updateTaskWorkflowInput;
 	repository: Repository;
 }
 
@@ -47,7 +52,7 @@ export function updateTaskWorkflow(
 	return command.repository
 		.getTask(command.input.id)
 		.andThen((task) =>
-			UpdateTask(task, command.input.title, command.input.status),
+			updateTask(task, command.input.title, command.input.status),
 		)
 		.andThen((updatedTask) => command.repository.updateTask(updatedTask));
 }

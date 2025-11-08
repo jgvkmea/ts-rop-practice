@@ -72,7 +72,7 @@ export function Task(titleValue: string): Result<Task, ValidationError> {
 	);
 }
 
-export function UpdateTask(
+export function updateTask(
 	task: Task,
 	titleValue?: string,
 	statusValue?: string,
