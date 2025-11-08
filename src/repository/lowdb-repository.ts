@@ -1,7 +1,7 @@
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 import { err, ok, type Result } from "neverthrow";
-import type { Task } from "../domain";
+import type { Task, TaskId } from "../domain";
 import type { NetworkErr, NotFoundErr, Repository } from "./types";
 
 type Schema = { tasks: Task[] };
@@ -50,7 +50,7 @@ export class LowdbRepository implements Repository {
 		}
 	}
 
-	getTask(id: string): Result<Task, NotFoundErr> {
+	getTask(id: TaskId): Result<Task, NotFoundErr> {
 		const foundTask = db.data.tasks.find((task) => task.id === id);
 		if (foundTask) {
 			return ok(foundTask);
