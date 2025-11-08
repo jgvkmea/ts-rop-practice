@@ -36,6 +36,20 @@ export class LowdbRepository implements Repository {
 		}
 	}
 
+	updateTask(task: Task): Result<Task, NotFoundErr> {
+		const index = db.data.tasks.findIndex((t) => t.id === task.id);
+		if (index !== -1) {
+			db.data.tasks[index] = task;
+			db.write();
+			return ok(task);
+		} else {
+			return err({
+				type: "NotFoundError",
+				message: "タスクが見つかりません。",
+			});
+		}
+	}
+
 	getTask(id: string): Result<Task, NotFoundErr> {
 		const foundTask = db.data.tasks.find((task) => task.id === id);
 		if (foundTask) {

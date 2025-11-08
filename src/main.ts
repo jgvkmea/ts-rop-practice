@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { createTaskHandler, getTaskHandler } from "./handler";
+import { createTaskHandler, getTaskHandler, updateTaskHandler } from "./handler";
 
 const app = new Hono();
 
@@ -10,6 +10,10 @@ app.post("/tasks", (c) => {
 
 app.get("/tasks/:id", (c) => {
 	return getTaskHandler(c);
+});
+
+app.put("/tasks/:id", (c) => {
+  return updateTaskHandler(c);
 });
 
 serve(

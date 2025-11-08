@@ -1,5 +1,5 @@
 import type { Result } from "neverthrow";
-import { Task, type ValidationError } from "../domain/task";
+import { Task, UpdateTask, type ValidationError } from "../domain/task";
 import type { NetworkErr, NotFoundErr, Repository } from "../repository/index";
 
 interface createTaskWorkflowInput {
@@ -30,4 +30,24 @@ export function getTaskWorkflow(
 	command: getTaskWorkflowCommand,
 ): Result<Task, NotFoundErr> {
 	return command.repository.getTask(command.input.id);
+}
+
+export interface updateTaskWorkflowCommand {
+	input: {
+		id: string;
+		title?: string;
+		status?: string;
+	};
+	repository: Repository;
+}
+
+export function updateTaskWorkflow(
+	command: updateTaskWorkflowCommand,
+): Result<Task, NotFoundErr | NetworkErr | ValidationError> {
+	return command.repository
+		.getTask(command.input.id)
+		.andThen((task) =>
+			UpdateTask(task, command.input.title, command.input.status),
+		)
+		.andThen((updatedTask) => command.repository.updateTask(updatedTask));
 }

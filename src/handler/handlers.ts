@@ -7,10 +7,13 @@ import {
 	type createTaskWorkflowCommand,
 	getTaskWorkflow,
 	type getTaskWorkflowCommand,
+	updateTaskWorkflow,
+	type updateTaskWorkflowCommand,
 } from "../workflows";
 
 export type ValidationError = { type: "ValidationError"; message: string };
 
+// Create Task Handler
 export async function createTaskHandler(c: Context) {
 	return (await createTaskHandlerCommand(c)).andThen(createTaskWorkflow).match(
 		(value) => c.json(value),
@@ -56,6 +59,7 @@ async function createTaskHandlerCommand(
 	});
 }
 
+// Get Task Handler
 export async function getTaskHandler(c: Context) {
 	return (await getTaskHandlerCommand(c)).andThen(getTaskWorkflow).match(
 		(value) => c.json(value),
@@ -74,24 +78,74 @@ export async function getTaskHandler(c: Context) {
 
 function getTaskHandlerCommand(
 	c: Context,
-): Promise<Result<getTaskWorkflowCommand, ValidationError>> {
+): Result<getTaskWorkflowCommand, ValidationError> {
 	const id = c.req.param("id");
 
 	if (!id) {
-		return Promise.resolve(
-			err({
-				type: "ValidationError",
-				message: "IDが指定されていません。",
-			}),
-		);
+		return err({
+			type: "ValidationError",
+			message: "IDが指定されていません。",
+		});
 	}
 
-	return Promise.resolve(
-		ok({
-			input: {
-				id: id,
-			},
-			repository: new LowdbRepository(), // TODO: DIちゃんとやる
-		}),
+	return ok({
+		input: {
+			id: id,
+		},
+		repository: new LowdbRepository(),
+	});
+}
+
+// Update Task Handler
+export async function updateTaskHandler(c: Context) {
+	return (await updatedTaskCommand(c)).andThen(updateTaskWorkflow).match(
+		(value) => c.json(value),
+		(e) => {
+			switch (e.type) {
+				case "ValidationError":
+					return c.json({ message: e.message }, 400);
+				case "NotFoundError":
+					return c.json({ message: e.message }, 404);
+				case "NetworkError":
+					return c.json({ message: e.message }, 503);
+				default:
+					return c.json({ message: "Internal Server Error" }, 500);
+			}
+		},
 	);
+}
+
+const UpdateTaskRequest = z.object({
+	title: z.string().optional(),
+	status: z.string().optional(),
+});
+
+async function updatedTaskCommand(
+	c: Context,
+): Promise<Result<updateTaskWorkflowCommand, ValidationError>> {
+	const id = c.req.param("id");
+	if (!id) {
+		return err({
+			type: "ValidationError",
+			message: "IDが指定されていません。",
+		});
+	}
+
+	const body = await c.req.json();
+	const result = UpdateTaskRequest.safeParse(body);
+	if (!result.success) {
+		return err({
+			type: "ValidationError",
+			message: result.error.message,
+		});
+	}
+
+	return ok({
+		input: {
+			id: id,
+			title: result.data.title,
+			status: result.data.status,
+		},
+		repository: new LowdbRepository(),
+	});
 }

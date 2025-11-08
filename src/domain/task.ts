@@ -71,3 +71,21 @@ export function Task(titleValue: string): Result<Task, ValidationError> {
 		},
 	);
 }
+
+export function UpdateTask(
+	task: Task,
+	titleValue?: string,
+	statusValue?: string,
+): Result<Task, ValidationError> {
+	titleValue = titleValue ?? task.title;
+	statusValue = statusValue ?? task.status;
+
+	const title = Title(titleValue);
+	const status = Status(statusValue);
+
+	return Result.combine([title, status]).map(([title, status]) => ({
+		...task,
+		title,
+		status,
+	}));
+}
