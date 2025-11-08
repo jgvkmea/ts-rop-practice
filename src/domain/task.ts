@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { err, ok,  Result } from "neverthrow";
+import { err, ok, Result } from "neverthrow";
 import { isUUID } from "../utils";
 
 // TaskId
@@ -13,12 +13,12 @@ export function TaskId(id?: string): Result<TaskId, ValidationError> {
 			message: "IDは空にできません",
 		});
 	}
-  if (!isUUID(value)) {
-    return err({
-      type: "ValidationError",
-      message: "IDの形式が不正です。UUID形式である必要があります。",
-    });
-  }
+	if (!isUUID(value)) {
+		return err({
+			type: "ValidationError",
+			message: "IDの形式が不正です。UUID形式である必要があります。",
+		});
+	}
 	return ok(value as TaskId);
 }
 
@@ -40,9 +40,7 @@ export type Status = ("todo" | "in progress" | "completed" | "canceled") & {
 	readonly __brand: "Status";
 };
 
-export function Status(
-	status: string,
-): Result<Status, ValidationError> {
+export function Status(status: string): Result<Status, ValidationError> {
 	const validStatuses = ["todo", "in progress", "completed", "canceled"];
 	if (!validStatuses.includes(status)) {
 		return err({
@@ -67,7 +65,9 @@ export function Task(titleValue: string): Result<Task, ValidationError> {
 	const titleResult = Title(titleValue);
 	const statusResult = Status("todo");
 
-  return Result.combine([taskIdResult, titleResult, statusResult]).map(([id, title, status]) => {
-		return { id, title, status };
-	});
+	return Result.combine([taskIdResult, titleResult, statusResult]).map(
+		([id, title, status]) => {
+			return { id, title, status };
+		},
+	);
 }
